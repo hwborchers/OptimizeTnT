@@ -1,6 +1,6 @@
 ## The 'unit-length' Constraint
 
-The unit-length restriction or $sum(x^2) = 1$ constraint will appear in many numerical, technical, and data analysis applications. It is a quadratic constraint and cannot be easily eliminated, compared to eliminating a variable given the linear constraint $sum(x) = 1$.
+The unit-length restriction or `sum(x^2) = 1` constraint will appear in many numerical, technical, and data analysis applications. It is a quadratic constraint and cannot be easily eliminated, compared to eliminating a variable given the linear constraint `sum(x) = 1`.
 
 We will look at different approaches to solve optimization problems under the unit-length constraint.
 
@@ -30,7 +30,7 @@ As an example objective function we will take the Rosenbrock function in 'adagio
 ```r
   fn = function(x) {
       x1 <- stereographic_inv(c(x, 1))
-      adagio::fnRosenbrock(x1)
+      fn(x1)
 }
 ```
 
