@@ -13,9 +13,11 @@ We will look at different approaches to solve optimization problems under the un
 ### Stereographic Projection
 
 The **stereographic projection** is implemented in package 'pracma' as `stereographic()` with its inverse as `stereographic_inv()`. Imagine the sphere $S^n \in R^{n+1}$ defined by
+
 $$
-  S^n = \{x \in R^{n+1} |\; ||x|| = 1\}
+  S^n = \\{x \in R^{n+1} |\\; ||x|| = 1\\}
 $$
+
 The stereographic projection takes the south pole $Sp = (0,...,0, -1)$ as the center of projection. Each point on the sphere will be projected onto a point on the tangent plane at the north pole $Np = (0,...,0, +1)$.
 
 The inverse projection is defined similarly. The procedure defines a bijection (actually a *diffeomorphism*) between $S$ minus the south pole and a plane representing $R^{n-1}$.
