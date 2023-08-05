@@ -98,3 +98,29 @@ We can compare these two solutions by plotting the function along the line from 
 print(c(sol$fmin, ans$value), digits=12)
 ## [1] 26.2276990802 26.2276990802
 ```
+
+
+### Appendix
+
+#### Inverse Stereographic Projection
+
+The *inverse stereographic projection* is a bijective, smooth map from $R^{n-1} \\times {1}$ to $S^n$. In 'pracma' this function is implemented as
+
+```r
+stereographic_inv <- function(q) {
+    stopifnot(is.numeric(q))
+    if (is.vector(q)) q = as.matrix(q)
+    m <- nrow(q); n <- ncol(q)
+
+    f <- zeros(m, 1)
+    f[m] <- -1.0
+    ff <- repmat(f, 1, n)
+
+    s <- 4.0 / (4.0 + apply(q[1:(m-1),1:n, drop = FALSE]^2, 2, sum))
+    ss <- repmat (s, m, 1)
+
+    p <- ss * q + (1.0 - ss) * ff[1:m,1:n]
+    return(p)
+}
+
+```
