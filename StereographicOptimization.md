@@ -6,7 +6,7 @@ We will look at different approaches to solve optimization problems under the un
 
 ```r
   library(adagio)
-  fn <- fnRosenbrock
+  # fn <- fnRosenbrock
 ```
 
 
@@ -30,7 +30,7 @@ As an example objective function we will take the Rosenbrock function in 'adagio
 ```r
   fn = function(x) {
       x1 <- stereographic_inv(c(x, 1))
-      fn(x1)
+      fnRosenbrock(x1)
 }
 ```
 
@@ -68,7 +68,7 @@ sum(my_xmin^2)
 and we can verify the minimum by calling the Rosenbrock function on it.
 
 ```r
-adagio::fnRosenbrock(my_xmin)
+fnRosenbrock(my_xmin)
 ## [1] 26.2277
 ```
 
