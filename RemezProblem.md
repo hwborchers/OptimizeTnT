@@ -2,19 +2,20 @@
 title: "The Remez Problem"
 author: "Hans W Borchers"
 date: "September 15, 2023"
-format:
-  html:
-    toc: true
-    toc-depth: 3
-    toc-float:
-      collapsed: false
-    code-fold: false
-    html-math-method: katex
-    keep-md: true
-    # theme: cerulean
 ---
 
+# The Remez problem
 
+* [What is the Remez problem](#what-is-the-remez-problem)
+* [Solve the discrete Remez problem](#solve-the-discrete-remez-problem)
+  * [Solve as convex problem](#solve-as-convex-problem)
+  * [Solve as constrained problem](#solve-as-constrained-problem)
+* [Apply the Remez algorithm](#apply-the-remez-algorithm)
+  * [MATLAB](#matlab)
+  * [Julia](#julia)
+  * [R package minimaxApprox](#r-package-minimaxapprox)
+* [An example](#an-example)
+* [References](#references)
 
 ## What is the Remez problem?
 
@@ -23,6 +24,7 @@ The **Remez problem** is the task to find or calculate the best polynomial appro
 $$
 \min_p ! \max_x |p(x) - f(x)|
 $$
+
 where the maximum is taken over all points in the interval.
 
 Most of the time, statisticians are interested in least-squares $L_2$ or $L_1$ approximations. But such an $L_{\infty}$ solution can be important, e.g., if one has to guarantee the a polynomial approximation is accurate within a specific $\epsilon$ distance from the true function value on a whole interval.
@@ -50,10 +52,7 @@ Remember that the Vandermonde matrix $A = A(x_1, \ldots, n_n)$ of $n$ grid point
 
 We compute the Vandermonde matrix as an outer product.
 
-
-::: {.cell}
-
-```{.r .cell-code}
+```
 library(pracma)
 library(CVXR, warn.conflicts = FALSE)
 
@@ -65,15 +64,10 @@ y <- fnRunge(x)             # apply Runge's function
 
 A <- outer(x, (m-1):0, '^') # Vandermonde matrix
 ```
-:::
-
 
 Now we can formulate the minimax request as minimizing the expression `max(abs(y - A %*% p))` in the syntax required by the 'CVXR' package.
 
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 p <- Variable(11)                             # 11-dimensional variable
 objective <- Minimize(max(abs(y - A %*% p)))  # minimax objective
 problem <- Problem(objective)                 # problem w/o constraints
@@ -82,13 +76,7 @@ p = result$getValue(p)                        # get the optimal value
 result$value
 ```
 
-::: {.cell-output .cell-output-stdout}
-```
-[1] 0.06547174
-```
-:::
-:::
-
+    [1] 0.06547174
 
 The maximal distance between the discrete points on the Runge function and its polynomial approximation is 0.06547174. Because these are not *all* the points on the Runge function, the actual distance between the function and the approximation will be slightly bigger (see below that the true value is 0.7% higher).
 
@@ -96,10 +84,7 @@ Of course, the result will be more accurate when more grid points are used. For 
 
 Here is a plot showing the Runge function and its polynomial minimax approximation of degree 10. 
 
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 plot(x, y, type ='l', col = "blue",     # plot the Runge function
      ylim = c(-0.1, 1.1), main = "Runge function and approximation")
 grid()
@@ -107,11 +92,7 @@ yp <- polyval(c(p), x)                  # calculate the fitted values
 lines(x, yp, col ="red")                #   and plot them in red
 ```
 
-::: {.cell-output-display}
-![](RemezProblem_files/figure-html/unnamed-chunk-3-1.png){width=672}
-:::
-:::
-
+![Remez Plot 1](figs/remez-3.1-plot.png)
 
 As a complex-analytic function, Runge has a pole at $0 + 0.2\,i$ that prevents polynomials to approximate it as well as one would expect.
 
@@ -121,10 +102,7 @@ We could be tempted to solve this as a simple minimization problem, but beware: 
 
 Instead -- as is common practice for minimax problems -- we add another variable, convert the objective function into a smooth one, and put all the minmax conditions into the constraints.
 
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 library(nloptr)
 
 n <- 101; m = 11            # polynomial of degree 10
@@ -138,51 +116,28 @@ hin <- function(p) {        # maximum conditions as constraints
     return( c(p[12] + h, p[12] - h) )
 }
 ```
-:::
-
 
 The two terms in `c(p[12] + h, p[12] - h)` are needed to replace the absolute value, i.e., the constraints are smooth, too. In total we get more than 200 constraints, so a quite powerful constraint solver is needed.
 
 Now call `slsqp` from the 'nloptr' package. 
 
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 x0 <- c(rep(1.0, 11), 1.0)
 sol <- slsqp(x0, fn, hin = hin,
              control = list(maxeval = 2000, xtol_rel = 1e-15))
-```
 
-::: {.cell-output .cell-output-stderr}
-```
-For consistency with the rest of the package the inequality sign may be switched from >= to <= in a future nloptr version.
-```
-:::
-
-```{.r .cell-code}
 cat("Minimax distance:", sol$value, '\nSolution parameters:\n')
 ```
 
-::: {.cell-output .cell-output-stdout}
-```
-Minimax distance: 0.0654678 
-Solution parameters:
-```
-:::
+    Minimax distance: 0.0654678 
+    Solution parameters:
 
-```{.r .cell-code}
+```r
 zapsmall(sol$par)
 ```
 
-::: {.cell-output .cell-output-stdout}
-```
- [1]  -50.24826    0.00000  135.85352    0.00000 -134.20107    0.00000
- [7]   59.19316    0.00000  -11.55888    0.00000    0.93453    0.06547
-```
-:::
-:::
-
+     [1]  -50.24826    0.00000  135.85352    0.00000 -134.20107    0.00000
+     [7]   59.19316    0.00000  -11.55888    0.00000    0.93453    0.06547
 
 The minimax distance is slightly smaller as with a convex solver; this no surprise as convex solvers are in general more accurate.
 
@@ -260,81 +215,47 @@ Actually, 'Remez.jl' applies higher-precision numbers ("big numbers") to minimiz
 
 There is a new package on CRAN that attempts to implement the Remez algorithm in pure R. It is usable, but there appear to be bugs. When we ask for a polynomial approximation of degree 10, we get an error message.
 
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 library(minimaxApprox)
 from <- -1.0; to <- 1.0
 fnRunge <- function(x) 1/(1 + (5 * x)^2)
-```
-:::
-
-
-```r
 sol <- minimaxApprox(fn = fnRunge, from, to, degree = 10)
-## Error in solve.default(polyMat(x, y, relErr), y) :
-##  system is computationally singular:
-##  reciprocal condition number = 2.00539e-19
 ```
+
+    ## Error in solve.default(polyMat(x, y, relErr), y) :
+    ##  system is computationally singular:
+    ##  reciprocal condition number = 2.00539e-19
 
 Instead we will try degree 11 hoping for a result that can be interpreted in polynomial degree 10, too.
 
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 sol <- minimaxApprox(fn = fnRunge, from, to, degree = 11)
 sol$a
 ```
 
-::: {.cell-output .cell-output-stdout}
-```
- [1]  9.340771e-01 -1.855657e-15 -1.155302e+01  3.126176e-13  5.917189e+01
- [6] -1.939782e-12 -1.341553e+02  4.249187e-12  1.357960e+02 -3.850310e-12
-[11] -5.022113e+01  1.230144e-12
-```
-:::
-:::
-
+     [1]  9.340771e-01 -1.855657e-15 -1.155302e+01  3.126176e-13  5.917189e+01
+     [6] -1.939782e-12 -1.341553e+02  4.249187e-12  1.357960e+02 -3.850310e-12
+    [11] -5.022113e+01  1.230144e-12
 
 and with an 'observed' resp. 'expected' error of 0.06592293.
 
 The highest coefficient is almost 0, so forgetting it will leave us with a vector of length 11, or as a coefficient vector of a 10th degree polynomial. We calculate the minimax error manually (for applying 'pracma's `polyval` function we have to reverse the coefficients):
 
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 p <- rev(sol$a[1:11])
 max(abs(pracma::polyval(p, x) - y))
 ```
 
-::: {.cell-output .cell-output-stdout}
-```
-[1] 0.06592293
-```
-:::
-:::
-
+    [1] 0.06592293
 
 We also see that the uneven coefficients are very small. The reason is that the Runge function is 'even', i.e., `fnRunge(-x) = fnRunge(x)`. If we set all these coefficients to 0, the result is not as good as before.
 
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 p <- rev(zapsmall(sol$a[1:11]))
 max(abs(pracma::polyval(p, x) - y))
 ```
 
-::: {.cell-output .cell-output-stdout}
-```
-[1] 0.06592154
-```
-:::
-:::
-
+    [1] 0.06592154
 
 This indicates that the coefficients that `minimaxApprox` produces are not really accurate. We hope for further approvements in this package. 
 
@@ -350,10 +271,7 @@ $$
 
 with coefficients $a_1, \ldots, a_5$ and a maximal error of $\epsilon(x) \le5 \cdot 10^{-5}$. We will try to veryfy this as a minimax approximation.
 
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 from <- 0.0; to <- 1.0
 fn <- function(x) gamma(x+1)
 a <- c( 1.0,                # coefficients as in the Handbook
@@ -363,53 +281,35 @@ a <- c( 1.0,                # coefficients as in the Handbook
         0.4245549,
        -0.1010678)
 ```
-:::
-
 
 Now apply the Remez algorithm to `fn` and compare coefficients,
 
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 library(minimaxApprox)
 sol <- minimaxApprox(fn = fn, from, to, degree = 5)
 
 cat("Max approximation error", sol$OE, '\n\n')
 ```
 
-::: {.cell-output .cell-output-stdout}
-```
-Max approximation error 3.711925e-05 
-```
-:::
+    Max approximation error 3.711925e-05 
 
-```{.r .cell-code}
+```r
 cbind(a, sol$a)
 ```
 
-::: {.cell-output .cell-output-stdout}
-```
-              a           
-[1,]  1.0000000  0.9999629
-[2,] -0.5748646 -0.5741662
-[3,]  0.9512363  0.9478703
-[4,] -0.6998588 -0.6937216
-[5,]  0.4245549  0.4201384
-[6,] -0.1010678 -0.1001209
-```
-:::
-:::
-
+                  a           
+    [1,]  1.0000000  0.9999629
+    [2,] -0.5748646 -0.5741662
+    [3,]  0.9512363  0.9478703
+    [4,] -0.6998588 -0.6937216
+    [5,]  0.4245549  0.4201384
+    [6,] -0.1010678 -0.1001209
 
 and we can see that the handbook approximation has been refined to return exactly 1.0 at the endpoints of the interval -- with the effect of slightly enlarging the error.
 
 We can plot the two error curves.
 
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 pn1 <- function(x) polyval(rev(a), x)
 pn2 <- function(x) polyval(rev(sol$a), x)
 
@@ -421,11 +321,7 @@ plot(xs, y1, type = 'l', lwd=2, col=4,
 lines(xs, y2, col=2, lwd=2); grid()
 ```
 
-::: {.cell-output-display}
-![](RemezProblem_files/figure-html/unnamed-chunk-12-1.png){width=672}
-:::
-:::
-
+![](figs/remez-3.2-plot.png)
 
 The blue line displays the error of the Handbook function, the red line the error of the minimax Approximation on the interval $[0, 1]$.
 
