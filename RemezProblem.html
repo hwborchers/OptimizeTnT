@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.340">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Hans W Borchers">
+<meta name="dcterms.date" content="2023-09-15">
+
+<title>The Remez Problem</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="RemezProblem_files/libs/clipboard/clipboard.min.js"></script>
+<script src="RemezProblem_files/libs/quarto-html/quarto.js"></script>
+<script src="RemezProblem_files/libs/quarto-html/popper.min.js"></script>
+<script src="RemezProblem_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="RemezProblem_files/libs/quarto-html/anchor.min.js"></script>
+<link href="RemezProblem_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="RemezProblem_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="RemezProblem_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="RemezProblem_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="RemezProblem_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#what-is-the-remez-problem" id="toc-what-is-the-remez-problem" class="nav-link active" data-scroll-target="#what-is-the-remez-problem">What is the Remez problem?</a></li>
+  <li><a href="#solve-the-discrete-remez-problem" id="toc-solve-the-discrete-remez-problem" class="nav-link" data-scroll-target="#solve-the-discrete-remez-problem">Solve the ‘discrete’ Remez problem</a>
+  <ul class="collapse">
+  <li><a href="#solve-as-convex-problem" id="toc-solve-as-convex-problem" class="nav-link" data-scroll-target="#solve-as-convex-problem">Solve as convex problem</a></li>
+  <li><a href="#solve-as-constrained-problem" id="toc-solve-as-constrained-problem" class="nav-link" data-scroll-target="#solve-as-constrained-problem">Solve as constrained problem</a></li>
+  </ul></li>
+  <li><a href="#apply-the-remez-algorithm" id="toc-apply-the-remez-algorithm" class="nav-link" data-scroll-target="#apply-the-remez-algorithm">Apply the Remez algorithm</a>
+  <ul class="collapse">
+  <li><a href="#matlab" id="toc-matlab" class="nav-link" data-scroll-target="#matlab">MATLAB</a></li>
+  <li><a href="#julia" id="toc-julia" class="nav-link" data-scroll-target="#julia">Julia</a></li>
+  <li><a href="#r-package-minimaxapprox" id="toc-r-package-minimaxapprox" class="nav-link" data-scroll-target="#r-package-minimaxapprox">R package ‘minimaxApprox’</a></li>
+  </ul></li>
+  <li><a href="#an-example" id="toc-an-example" class="nav-link" data-scroll-target="#an-example">An example</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">The Remez Problem</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Hans W Borchers </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 15, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="what-is-the-remez-problem" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-the-remez-problem">What is the Remez problem?</h2>
+<p>The <strong>Remez problem</strong> is the task to find or calculate the best polynomial approximation of a continuous function <span class="math inline">f</span> on a closed interval <span class="math inline">[a, b]</span>, such that the maximum absolute distance between the polynomial <span class="math inline">p</span> and the function is minimized,</p>
+<p><span class="math display">
+\min_p ! \max_x |p(x) - f(x)|
+</span> where the maximum is taken over all points in the interval.</p>
+<p>Most of the time, statisticians are interested in least-squares <span class="math inline">L_2</span> or <span class="math inline">L_1</span> approximations. But such an <span class="math inline">L_{\infty}</span> solution can be important, e.g., if one has to guarantee the a polynomial approximation is accurate within a specific <span class="math inline">\epsilon</span> distance from the true function value on a whole interval.</p>
+<p>The <strong>Remez algorithm</strong> (Remez 1934) is a complicative iterative procedure that has problems with floating-point precision. So there are not so many correct implementations in open-source software. The result is called the <em>minimax approximation</em>. See the Wikipedia article <a href="https://en.wikipedia.org/wiki/Remez_algorithm">Remez algorithm</a> for a short overview of the algorithm and its numerical problems with stability, and some more references.</p>
+<p>We will show how a discretized form of the Remez problem can be quite accurately solved in R as a convex problem resp. as a <em>minimax</em> problem with constrained optimization solvers. The difference to the true solution is relatively small.</p>
+<p>We will also show how existing Remez implementations in MATLAB or Julia can be called. Since short time there is also a first implementation in R that can be downloaded from CRAN. Our consistent example for the rest of the note will be the Runge function which is well-known for its problem with oscillations at the edges of the interval <span class="math inline">[-1, 1]</span></p>
+<p><span class="math display">
+\mathrm{Runge}(x) = \frac{1}{1 + (5x)^2}
+</span></p>
+<p>which is well-known for its problem with oscillations at the edges of the interval <span class="math inline">[-1, 1]</span>.</p>
+</section>
+<section id="solve-the-discrete-remez-problem" class="level2">
+<h2 class="anchored" data-anchor-id="solve-the-discrete-remez-problem">Solve the ‘discrete’ Remez problem</h2>
+<section id="solve-as-convex-problem" class="level3">
+<h3 class="anchored" data-anchor-id="solve-as-convex-problem">Solve as convex problem</h3>
+<p>Remember that the Vandermonde matrix <span class="math inline">A = A(x_1, \ldots, n_n)</span> of <span class="math inline">n</span> grid points has the property that given a polynomial <span class="math inline">p</span> as a vector, the expression <span class="math inline">p(x) = A\,p</span> will return the fitted values <span class="math inline">p(x)</span> of the polynomial at the points <span class="math inline">x</span>.</p>
+<p>We compute the Vandermonde matrix as an outer product.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pracma)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(CVXR, <span class="at">warn.conflicts =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>fnRunge <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fl">1.0</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="dv">25</span><span class="sc">*</span>x<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">101</span>; m <span class="ot">=</span> <span class="dv">11</span>            <span class="co"># polynomial of degree 10</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="at">length=</span>n)   <span class="co"># 101 grid points</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">fnRunge</span>(x)             <span class="co"># apply Runge's function</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">outer</span>(x, (m<span class="dv">-1</span>)<span class="sc">:</span><span class="dv">0</span>, <span class="st">'^'</span>) <span class="co"># Vandermonde matrix</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we can formulate the minimax request as minimizing the expression <code>max(abs(y - A %*% p))</code> in the syntax required by the ‘CVXR’ package.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">Variable</span>(<span class="dv">11</span>)                             <span class="co"># 11-dimensional variable</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>objective <span class="ot">&lt;-</span> <span class="fu">Minimize</span>(<span class="fu">max</span>(<span class="fu">abs</span>(y <span class="sc">-</span> A <span class="sc">%*%</span> p)))  <span class="co"># minimax objective</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>problem <span class="ot">&lt;-</span> <span class="fu">Problem</span>(objective)                 <span class="co"># problem w/o constraints</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">solve</span>(problem)                      <span class="co"># call convex solver</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>p <span class="ot">=</span> result<span class="sc">$</span><span class="fu">getValue</span>(p)                        <span class="co"># get the optimal value</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>result<span class="sc">$</span>value</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.06547174</code></pre>
+</div>
+</div>
+<p>The maximal distance between the discrete points on the Runge function and its polynomial approximation is 0.06547174. Because these are not <em>all</em> the points on the Runge function, the actual distance between the function and the approximation will be slightly bigger (see below that the true value is 0.7% higher).</p>
+<p>Of course, the result will be more accurate when more grid points are used. For example, with 1001 points the minimax distance will be 0.06590128, now correct for 4 digits.</p>
+<p>Here is a plot showing the Runge function and its polynomial minimax approximation of degree 10.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x, y, <span class="at">type =</span><span class="st">'l'</span>, <span class="at">col =</span> <span class="st">"blue"</span>,     <span class="co"># plot the Runge function</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.1</span>, <span class="fl">1.1</span>), <span class="at">main =</span> <span class="st">"Runge function and approximation"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>yp <span class="ot">&lt;-</span> <span class="fu">polyval</span>(<span class="fu">c</span>(p), x)                  <span class="co"># calculate the fitted values</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(x, yp, <span class="at">col =</span><span class="st">"red"</span>)                <span class="co">#   and plot them in red</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="RemezProblem_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>As a complex-analytic function, Runge has a pole at <span class="math inline">0 + 0.2\,i</span> that prevents polynomials to approximate it as well as one would expect.</p>
+</section>
+<section id="solve-as-constrained-problem" class="level3">
+<h3 class="anchored" data-anchor-id="solve-as-constrained-problem">Solve as constrained problem</h3>
+<p>We could be tempted to solve this as a simple minimization problem, but beware: the objective function <span class="math inline">\max_x |y - p(x)|</span> is <em>nonsmooth</em> because of the absolute value function involved. Most optimization solvers will fail to find the correct minimum.</p>
+<p>Instead – as is common practice for minimax problems – we add another variable, convert the objective function into a smooth one, and put all the minmax conditions into the constraints.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nloptr)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">101</span>; m <span class="ot">=</span> <span class="dv">11</span>            <span class="co"># polynomial of degree 10</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="at">length=</span>n)   <span class="co"># 101 grid points</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">fnRunge</span>(x)             <span class="co"># Runge function</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>fn <span class="ot">&lt;-</span> <span class="cf">function</span>(p) p[<span class="dv">12</span>]     <span class="co"># return only the new variable</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>hin <span class="ot">&lt;-</span> <span class="cf">function</span>(p) {        <span class="co"># maximum conditions as constraints</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    h <span class="ot">&lt;-</span> y <span class="sc">-</span> <span class="fu">polyval</span>(p[<span class="dv">1</span><span class="sc">:</span><span class="dv">11</span>], x)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>( <span class="fu">c</span>(p[<span class="dv">12</span>] <span class="sc">+</span> h, p[<span class="dv">12</span>] <span class="sc">-</span> h) )</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The two terms in <code>c(p[12] + h, p[12] - h)</code> are needed to replace the absolute value, i.e., the constraints are smooth, too. In total we get more than 200 constraints, so a quite powerful constraint solver is needed.</p>
+<p>Now call <code>slsqp</code> from the ‘nloptr’ package.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>x0 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="fl">1.0</span>, <span class="dv">11</span>), <span class="fl">1.0</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>sol <span class="ot">&lt;-</span> <span class="fu">slsqp</span>(x0, fn, <span class="at">hin =</span> hin,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">control =</span> <span class="fu">list</span>(<span class="at">maxeval =</span> <span class="dv">2000</span>, <span class="at">xtol_rel =</span> <span class="fl">1e-15</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>For consistency with the rest of the package the inequality sign may be switched from &gt;= to &lt;= in a future nloptr version.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Minimax distance:"</span>, sol<span class="sc">$</span>value, <span class="st">'</span><span class="sc">\n</span><span class="st">Solution parameters:</span><span class="sc">\n</span><span class="st">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Minimax distance: 0.0654678 
+Solution parameters:</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">zapsmall</span>(sol<span class="sc">$</span>par)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1]  -50.24826    0.00000  135.85352    0.00000 -134.20107    0.00000
+ [7]   59.19316    0.00000  -11.55888    0.00000    0.93453    0.06547</code></pre>
+</div>
+</div>
+<p>The minimax distance is slightly smaller as with a convex solver; this no surprise as convex solvers are in general more accurate.</p>
+</section>
+</section>
+<section id="apply-the-remez-algorithm" class="level2">
+<h2 class="anchored" data-anchor-id="apply-the-remez-algorithm">Apply the Remez algorithm</h2>
+<p>There are several implementations of the Remez algorithm, in MATLAB, in Julia, in Python, and since short in R. All these codes are based somehow on the article by Pachon and Trefethen (2008), see the references.</p>
+<section id="matlab" class="level3">
+<h3 class="anchored" data-anchor-id="matlab">MATLAB</h3>
+<p>In MATLAB, calling the Remez algorithm by Nick Trefethen and colleagues from Oxford University is very simple. We assume that the ‘Chebfun’ module is in the MATLAB path, then</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode octave code-with-copy"><code class="sourceCode octave"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">% Make a chebfun of Runge's function</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> chebfun( @(x) <span class="fl">1</span> <span class="op">./</span> ( <span class="fl">1</span> <span class="op">+</span> <span class="fl">25</span><span class="op">*</span>x<span class="op">.^</span><span class="fl">2</span> ) )<span class="op">;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">% Get the best approximation using Remez</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>cr <span class="op">=</span> <span class="fu">remez</span>( f <span class="op">,</span> <span class="fl">10</span> )<span class="op">;</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">% Get the maximum error</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="fu">fprintf</span>( <span class="st">'maximum error of chebfun remez: %e (%f s)\n'</span> <span class="op">,</span> <span class="fu">norm</span>( f <span class="op">-</span> cr <span class="op">,</span> <span class="fu">inf</span> ))<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>maximum error of chebfun remez: 6.592293e-02</code></pre>
+<p>This is the true minimax distance of Runge’s function and the minimax polynomial of degree 10, computed with the best available free software, accurate to 15 digits.</p>
+<p>In MATLAB it is also possible to apply the original CVX software by Boyd and his Stanford group, available as free software.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode octave code-with-copy"><code class="sourceCode octave"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">101</span><span class="op">;</span> n <span class="op">=</span> <span class="fl">11</span><span class="op">;</span>            <span class="co">% 101 points, polynomial of degree 10</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>xi <span class="op">=</span> <span class="fu">linspace</span>(<span class="op">-</span><span class="fl">1</span><span class="op">,</span> <span class="fl">1</span><span class="op">,</span> m)<span class="op">;</span>    <span class="co">% equidistant points in [-1, 1]</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>ri <span class="op">=</span> <span class="fl">1</span> <span class="op">./</span> (<span class="fl">1</span><span class="op">+</span>(<span class="fl">5</span><span class="op">*</span>xi)<span class="op">.^</span><span class="fl">2</span>)<span class="op">;</span>    <span class="co">% Runge function</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>                         <span class="co">% p is the polynomial of degree (n-1)</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>cvx_begin                   <span class="co">% minimize the distance in all points</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    variable p(n)<span class="op">;</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">minimize</span>( <span class="fu">max</span>(<span class="fu">abs</span>(<span class="fu">polyval</span>(p<span class="op">,</span> xi) <span class="op">-</span> ri)) )<span class="op">;</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>cvx_end</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>                         <span class="co">% 0.17 sec for Matlab, CVX and SeDuMi</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Here we can directly use the <code>polyval</code> function, which is not possible in the R syntax of CVXR. The result is a minimax distance of 0.0654, same as above with CVXR. See my discussion on <a href="https://scicomp.stackexchange.com/questions/1531/the-remez-algorithm">StackExchange</a> with Pedro from the Chebfun team about comparing the two approaches and the accuracy of results (and why that matters).</p>
+</section>
+<section id="julia" class="level3">
+<h3 class="anchored" data-anchor-id="julia">Julia</h3>
+<p>For Julia we utilize the ‘Remez.jl’ package that can be downloaded and installed from the main Julia servers. Then call <code>ratfn_minimax</code> with the function name, the interval, and the degrees of the numerator and denominator polynomials. We set the later to 0 to prevent any polynomial denominatot.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>julia<span class="op">&gt;</span> <span class="im">using</span> <span class="bu">Remez</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>julia<span class="op">&gt;</span> @. <span class="fu">runge</span>(x) <span class="op">=</span> <span class="fl">1.0</span> <span class="op">/</span> (<span class="fl">1.0</span> <span class="op">+</span> (<span class="fl">5.0</span> <span class="op">*</span> x)<span class="op">^</span><span class="fl">2</span>)    <span class="co"># Runge function</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>julia<span class="op">&gt;</span> N, D, E, X <span class="op">=</span> <span class="fu">ratfn_minimax</span>(runge, [<span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>], <span class="fl">10</span>, <span class="fl">0</span>);</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>julia<span class="op">&gt;</span> E</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>julia<span class="op">&gt;</span> <span class="fu">float</span>(N)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>0.0659229266608402
+
+11-element Vector{BigFloat}:
+    0.9340770733391597
+   -4.3052651518119263e-55
+  -11.5530156918588831
+    1.7372592302396026e-53
+   59.1718922314996475
+   -8.5939707001636868e-53
+ -134.1552503674891540
+    1.1735594422217025e-52
+  135.7959650680182781
+   -4.7273337541126141e-53
+  -50.2211297017083501</code></pre>
+<p>Actually, ‘Remez.jl’ applies higher-precision numbers (“big numbers”) to minimize the effect of inaccuracies in floating-point calculations. I have shortened the output to 16 digits. The minimax distance is 0.06592293 compared to the 0.06547174 result from a discretised optimization.</p>
+</section>
+<section id="r-package-minimaxapprox" class="level3">
+<h3 class="anchored" data-anchor-id="r-package-minimaxapprox">R package ‘minimaxApprox’</h3>
+<p>There is a new package on CRAN that attempts to implement the Remez algorithm in pure R. It is usable, but there appear to be bugs. When we ask for a polynomial approximation of degree 10, we get an error message.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(minimaxApprox)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>from <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fl">1.0</span>; to <span class="ot">&lt;-</span> <span class="fl">1.0</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>fnRunge <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span> <span class="sc">+</span> (<span class="dv">5</span> <span class="sc">*</span> x)<span class="sc">^</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>sol <span class="ot">&lt;-</span> <span class="fu">minimaxApprox</span>(<span class="at">fn =</span> fnRunge, from, to, <span class="at">degree =</span> <span class="dv">10</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Error in solve.default(polyMat(x, y, relErr), y) :</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="do">##  system is computationally singular:</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="do">##  reciprocal condition number = 2.00539e-19</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Instead we will try degree 11 hoping for a result that can be interpreted in polynomial degree 10, too.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>sol <span class="ot">&lt;-</span> <span class="fu">minimaxApprox</span>(<span class="at">fn =</span> fnRunge, from, to, <span class="at">degree =</span> <span class="dv">11</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>sol<span class="sc">$</span>a</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1]  9.340771e-01 -1.855657e-15 -1.155302e+01  3.126176e-13  5.917189e+01
+ [6] -1.939782e-12 -1.341553e+02  4.249187e-12  1.357960e+02 -3.850310e-12
+[11] -5.022113e+01  1.230144e-12</code></pre>
+</div>
+</div>
+<p>and with an ‘observed’ resp. ‘expected’ error of 0.06592293.</p>
+<p>The highest coefficient is almost 0, so forgetting it will leave us with a vector of length 11, or as a coefficient vector of a 10th degree polynomial. We calculate the minimax error manually (for applying ’pracma’s <code>polyval</code> function we have to reverse the coefficients):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">rev</span>(sol<span class="sc">$</span>a[<span class="dv">1</span><span class="sc">:</span><span class="dv">11</span>])</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">max</span>(<span class="fu">abs</span>(pracma<span class="sc">::</span><span class="fu">polyval</span>(p, x) <span class="sc">-</span> y))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.06592293</code></pre>
+</div>
+</div>
+<p>We also see that the uneven coefficients are very small. The reason is that the Runge function is ‘even’, i.e., <code>fnRunge(-x) = fnRunge(x)</code>. If we set all these coefficients to 0, the result is not as good as before.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">rev</span>(<span class="fu">zapsmall</span>(sol<span class="sc">$</span>a[<span class="dv">1</span><span class="sc">:</span><span class="dv">11</span>]))</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">max</span>(<span class="fu">abs</span>(pracma<span class="sc">::</span><span class="fu">polyval</span>(p, x) <span class="sc">-</span> y))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.06592154</code></pre>
+</div>
+</div>
+<p>This indicates that the coefficients that <code>minimaxApprox</code> produces are not really accurate. We hope for further approvements in this package.</p>
+</section>
+</section>
+<section id="an-example" class="level2">
+<h2 class="anchored" data-anchor-id="an-example">An example</h2>
+<p>The Remez algorithm is often utilized in Signal processing for the problem of optimal signal design. Here we will apply it to function approximation, verifying an approximation in the “Handbook of Mathematical Functions” by Abramovichand Stegun.</p>
+<p>For the Gamma function on the interval <span class="math inline">[1, 2]</span> the following polynomial approximation is given (on p.&nbsp;257) as</p>
+<p><span class="math display">
+\Gamma(x+1) = 1 + a_1 x_1 + a_2 x_2^2 + a_3 x_3^3 + a_4 x_4^4 + a_5 x_5^5 + \epsilon(x)
+</span></p>
+<p>with coefficients <span class="math inline">a_1, \ldots, a_5</span> and a maximal error of <span class="math inline">\epsilon(x) \le5 \cdot 10^{-5}</span>. We will try to veryfy this as a minimax approximation.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>from <span class="ot">&lt;-</span> <span class="fl">0.0</span>; to <span class="ot">&lt;-</span> <span class="fl">1.0</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>fn <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">gamma</span>(x<span class="sc">+</span><span class="dv">1</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="fl">1.0</span>,                <span class="co"># coefficients as in the Handbook</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>       <span class="sc">-</span><span class="fl">0.5748646</span>,</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>        <span class="fl">0.9512363</span>,</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>       <span class="sc">-</span><span class="fl">0.6998588</span>,</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>        <span class="fl">0.4245549</span>,</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>       <span class="sc">-</span><span class="fl">0.1010678</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now apply the Remez algorithm to <code>fn</code> and compare coefficients,</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(minimaxApprox)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>sol <span class="ot">&lt;-</span> <span class="fu">minimaxApprox</span>(<span class="at">fn =</span> fn, from, to, <span class="at">degree =</span> <span class="dv">5</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Max approximation error"</span>, sol<span class="sc">$</span>OE, <span class="st">'</span><span class="sc">\n\n</span><span class="st">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Max approximation error 3.711925e-05 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cbind</span>(a, sol<span class="sc">$</span>a)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              a           
+[1,]  1.0000000  0.9999629
+[2,] -0.5748646 -0.5741662
+[3,]  0.9512363  0.9478703
+[4,] -0.6998588 -0.6937216
+[5,]  0.4245549  0.4201384
+[6,] -0.1010678 -0.1001209</code></pre>
+</div>
+</div>
+<p>and we can see that the handbook approximation has been refined to return exactly 1.0 at the endpoints of the interval – with the effect of slightly enlarging the error.</p>
+<p>We can plot the two error curves.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>pn1 <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">polyval</span>(<span class="fu">rev</span>(a), x)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>pn2 <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">polyval</span>(<span class="fu">rev</span>(sol<span class="sc">$</span>a), x)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>xs <span class="ot">=</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">len=</span><span class="dv">1000</span>)</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>y1 <span class="ot">=</span> <span class="fu">fn</span>(xs) <span class="sc">-</span> <span class="fu">pn1</span>(xs)</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>y2 <span class="ot">=</span> <span class="fu">fn</span>(xs) <span class="sc">-</span> <span class="fu">pn2</span>(xs)</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xs, y1, <span class="at">type =</span> <span class="st">'l'</span>, <span class="at">lwd=</span><span class="dv">2</span>, <span class="at">col=</span><span class="dv">4</span>,</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Errors for the Gamma function approximation"</span>)</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(xs, y2, <span class="at">col=</span><span class="dv">2</span>, <span class="at">lwd=</span><span class="dv">2</span>); <span class="fu">grid</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="RemezProblem_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The blue line displays the error of the Handbook function, the red line the error of the minimax Approximation on the interval <span class="math inline">[0, 1]</span>.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<p>Abramowitz/Stegun, Handbook of Mathematical Functions. 1964/1972. URL: http://www.convertit.com/Go/ConvertIt/Reference/AMS55.ASP</p>
+<p>R. Pachon and L.N. Trefethen. “Barycentric-Remez algorithms for best polynomial approximation in the chebfun system”. BIT Numerical Mathematics (2008) Vol. 46.<br>
+URL: https://people.maths.ox.ac.uk/trefethen/publication/PDF/2009_132.pdf</p>
+<p>E.Ya. Remez. “Sur le calcul effectiv des polynômes d’approximation de Tschebyscheff”. Compt. Rend. Acad. Sc., 1934, 199, S. 337–340.</p>
+<p>Abiy Tasissa. “Function approximation and the Remez algorithm”. Tufts University, 2019, and Universitá di Padova, 2021.<br>
+URL: https://sites.tufts.edu/atasissa/files/2019/09/remez.pdf</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
