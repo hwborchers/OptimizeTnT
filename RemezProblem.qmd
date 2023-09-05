@@ -211,7 +211,7 @@ The function found the degree 10 polynomial by checking the degree 11.
 We can also calculate the minimax error manually in two ways:
 
   1. Using `minimaxApprox::minimaxErr`
-  2. Using `pracma`'s `polyval` function, for which we have to reverse the coefficients):
+  2. Using `pracma`'s `polyval` function, for which we have to reverse the coefficients:
 
 ```{r}
 max(abs(minimaxErr(x, sol)))
@@ -219,7 +219,7 @@ p <- rev(sol$a[1:11])
 max(abs(pracma::polyval(p, x) - y))
 ```
 
-These match with value returned by Chebfun. However, ee also see that the odd coefficients are very small. The reason is that the Runge function is 'even', i.e., `fnRunge(-x) = fnRunge(x)`. Using the package's `ztol` option, we can request that values whose contribution to the sum are below a certain tolerance be set to 0. Here we can set `ztol` to 1e-9. 
+These match with value returned by Chebfun. However, we also see that the odd coefficients are very small. The reason is that the Runge function is 'even', i.e., `fnRunge(-x) = fnRunge(x)`. Using the package's `ztol` option, we can request that values whose contribution to the sum are below a certain tolerance be set to 0. Here we can set `ztol` to 1e-9. 
 
 ```{r}
 sol2 <- minimaxApprox(fn = fnRunge, from, to, degree = 10, opts = list(ztol = 1e-9))
