@@ -1,19 +1,14 @@
----
-title: Selected Solvers
-author: Hans W Borchers
-date: October 4, 2023
----
 
 # Selected Optimization Packages
 
-The Optimization Task View presents a long list of optimization solvers available in R packages. Here is a selection of modern and state-of-the-art solvers, taken from the task view, for different optimization problem classes. Each solver is accompanied by a usage line, a link to its help page, and maybe to an appropriate Wipipedia page .
+The Optimization Task View presents a long list of optimization solvers available in R packages. Here is a selection of modern and state-of-the-art solvers, taken from the task view, for different optimization problem classes. Each solver is accompanied by a usage line, a link to its help page, and maybe to an appropriate Wikipedia page.
 
 **Contents**
 
 * [Unconstrained optimization](#unconstrained-optimization)
-* [Constrained optimization](#constrainedooptimization)
+* [Constrained optimization](#constrained-optimization)
 * [Quadratic optimization](#quadratic-optimization)
-* [Least-squares problems](#Least-squares-problems)
+* [Least-squares problems](#least-squares-problems)
 * [Convex optimization](#convex-optimization)
 * [Derivative-free optimization](#derivative-free-optimization)
 * [Global and stochastic optimization](#global-and-stochastic-optimization)
@@ -133,13 +128,13 @@ auglag(par, fn, gr, hin, hin.jac, heq, heq.jac,
 ```
 [help page](https://cran.r-universe.dev/alabama/doc/manual.html#auglag)
 
-`auglag`implements the Augmented Lagrangian Minimization Algorithm for optimizing smooth nonlinear objective functions with constraints. Linear or nonlinear equality and inequality constraints are allowed.
+`auglag 'implements the Augmented Lagrangian Minimization Algorithm for optimizing smooth nonlinear objective functions with constraints. Linear or nonlinear equality and inequality constraints are allowed.
 
 *Note*: There is also function `constrOptim.nl`, applying an Augmented Lagrangian Adaptive Barrier Minimization Algorithm; can be used to replace `constrOptim` in Base R.
 
 ----
 
-#### NLcOptim::**solnl**
+#### NlcOptim::**solnl**
 
 ```r
 solnl(X = NULL, objfun = NULL, confun = NULL, A = NULL, B = NULL,
@@ -149,7 +144,7 @@ solnl(X = NULL, objfun = NULL, confun = NULL, A = NULL, B = NULL,
 ```
 [help page](https://cran.r-universe.dev/NlcOptim/doc/manual.html#solnl)
 
-`solnl` implements the Sequential Quadratic Programming (SQP) method to find solution for general nonlinear optimization problem (with nonlinear objective and constraint functions). Linear or nonlinear equality and inequality constraints are allowed. 
+`solnl` implements the Sequential Quadratic Programming (SQP) method to find solutions for general nonlinear optimization problems (with nonlinear objective and constraint functions). Linear or nonlinear equality and inequality constraints are allowed. 
 
 *Note*: The SQP method is described in detail in the book "Numeric Optimization" by Nocedal and Wright. [wp:SQP](https://en.wikipedia.org/wiki/Sequential_quadratic_programming)
 
@@ -198,7 +193,7 @@ cobyla(x0, fn, lower = NULL, upper = NULL, hin = NULL,
 
 ### Quadratic optimization
 
-> Quadratic optimization (or: Quadratic Programming, QP) problems are optimization problems of the form $\min_x 0.5\, x'Px + q' x$ with linear or quadratic constraints. These problems are ubiquiteous and appear in almost all data fitting and least-squares approximation tasks.
+> Quadratic optimization (or: Quadratic Programming, QP) problems are optimization problems of the form $\min_x 0.5\, x'Px + q' x$ with linear or quadratic constraints. These problems are ubiquitous and appear in almost all data fitting and least-squares approximation tasks.
 -- [wp:Quadratic programming](https://en.wikipedia.org/wiki/Quadratic_programming)
 
 #### osqp::**solve_osqp**
@@ -247,7 +242,7 @@ nlsr(formula = NULL, data = NULL, start = NULL,
 ```
 [help page](https://cran.r-universe.dev/nlsr/doc/manual.html#nlsr)
 
-`nlsr` provides solutions to a nonlinear least squares problem using the Nash Marquardt tools, i.e., internally applies the Levenberg-Marquardt algorithm. Conceived as a replacement for `nls`.
+`nlsr` provides solutions to a nonlinear least squares problem using the Nash Marquardt tools, i.e., internally applying the Levenberg-Marquardt algorithm. Conceived as a replacement for `nls`.
 
 ----
 
@@ -288,7 +283,7 @@ result$getValue(x)                          # retrieve the results
 
 *Note*: The code above is an example of how the modeling language looks like. It solves an isotonic least-squares regression $x_1 \le x_2 \le \ldots \le x_n$. There is no single `solve` function whose usage could be described. See the [Tutorial Examples](https://cvxr.rbind.io/examples/) in the documentation.
 
-*Remark*: There are more convex solvers in R packages (cf. 'clarabel', 'sdpt3r', 'cccp', etc.), their usage can indeed be a quite complex task even for an experienced user.
+*Remark*: There are more convex solvers in R packages (cf. 'clarabel', 'sdpt3r', 'cccp', etc.), and their usage can indeed be a quite complex task even for an experienced user.
 
 ----
 
@@ -333,7 +328,7 @@ anms(fn, x0, ..., tol = 1e-10, maxfeval = NULL)
 ```
 [help page](https://cran.r-universe.dev/pracma/doc/manual.html#anms)
 
-`anms` is an implementation of Nelder-Mead with adaptive parameters, based on ideas of Gao & Han 2012. It is particularly suitable for higher-dimensional problems (20-30 variables).
+`anms` is an implementation of Nelder-Mead with adaptive parameters, based on the ideas of Gao & Han 2012. It is particularly suitable for higher-dimensional problems (20-30 variables).
 
 ----
 
@@ -343,7 +338,7 @@ anms(fn, x0, ..., tol = 1e-10, maxfeval = NULL)
 
 ### Differential Evolution
 
-> Differential Evolution (DE) optimizes a problem by maintaining a population of candidate solutions and creating new candidate solutions by combining existing ones according to its simple formulae, and then keeping whichever candidate solution has the best score or fitness.
+> Differential Evolution (DE) optimizes a problem by maintaining a population of candidate solutions and creating new candidate solutions by combining existing ones according to their simple formulae, and then keeping whichever candidate solution has the best score or fitness.
 -- [wp:DE](https://en.wikipedia.org/wiki/Differential_evolution) and [wp:Global optimization](https://en.wikipedia.org/wiki/Global_optimization)
 
 #### DEoptim::**DEoptim**
@@ -372,7 +367,7 @@ JDEoptim(lower, upper, fn,
 ```
 [help page](https://cran.r-universe.dev/DEoptimR/doc/manual.html#JDEoptim)
 
-`JDEoptim` implements in pure R an Differential Evolution (DE) algorithm with "self-adapting control parameters", as suggested by Brest et al. 2006 (with Java code). It incorporates very general nonlinear (equality and inequality) constraints (though equality constraints seem to be problematic).
+`JDEoptim` implements in pure R a Differential Evolution (DE) algorithm with "self-adapting control parameters", as suggested by Brest et al. 2006 (with Java code). It incorporates very general nonlinear (equality and inequality) constraints (though equality constraints seem to be problematic).
 
 *Note*: It has many more control options than are shown on the usage line. The default values for population size `NP` and `maxiter` are too small.
 
@@ -390,7 +385,7 @@ GenSA(par = NULL, fn, lower, upper, control = list(), ...)
 ```
 [help page](https://cran.r-universe.dev/GenSA/doc/manual.html#GenSA)
 
-`GenSA` searches for global minimum of complicated non-linear objective functions with a large number of optima. It implements a generalized "Simulated Annealing" (SA) approach in C++, that is effective though not always as successful as Differential Evolution.
+`GenSA` searches for a global minimum of complicated non-linear objective functions with a large number of optima. It implements a generalized "Simulated Annealing" (SA) approach in C++, that is effective though not always as successful as Differential Evolution.
 
 ----
 
@@ -469,7 +464,7 @@ highs_solve(Q = NULL, L, lower, upper,
 [help page](https://cran.r-universe.dev/highs/doc/manual.html#highs_solve)
 and the [HiGHS](https://highs.dev/) Web page.
 
-'highs' wraps the HiGHS solver, currently among the best open source mixed integer linear programming solver. Solves linear and quadratic problems of the form $0.5 x'Qx + Lx$ with linear and bounds constraints:
+'highs' wraps the HiGHS solver, currently among the best open-source mixed integer linear programming solvers. Solves linear and quadratic problems of the form $0.5 x'Qx + Lx$ with linear and bounds constraints:
 $\text{lhs} \le Ax \le \text{rhs}$, $\text{lower} \le x \le \text{upper}$, and different types of variables (1 or 'C' continuous, 2 or 'I' integer, 3 or 'SC' semi-continuous, etc.).
 
 *Note*: Quadratic problems do not allow for integer variables.
@@ -503,7 +498,7 @@ CLP and CBC are open-source [COIN-OR](https://www.coin-or.org/) projects. CLP so
 
 ## Multivariate Root Finding
 
-> Finding roots of multivariate function could in principle be done by minimizing the square of the function values. But there are more specialized procedures to perform this task, inspired by Gauss-Newton or spectral approaches.
+> Finding roots of multivariate functions could in principle be done by minimizing the square of the function values. However there are more specialized procedures to perform this task, inspired by Gauss-Newton or spectral approaches.
 
 #### nleqslv::**nleqslv**
 
@@ -617,7 +612,7 @@ constrOptim(theta, f, grad, ui, ci, mu = 1e-04, control = list(),
 ```
 [help page](./man/constrOptim.html)
 
-Minimise a function subject to linear inequality constraints using an adaptive barrier algorithm. The feasible region is defined by `ui %*% theta - ci >= 0`. The starting value must be in the interior of the feasible region, but the minimum may be on the boundary.
+Minimize a function subject to linear inequality constraints using an adaptive barrier algorithm. The feasible region is defined by `ui %*% theta - ci >= 0`. The starting value must be in the interior of the feasible region, but the minimum may be on the boundary.
 
 ----
 
