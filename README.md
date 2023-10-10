@@ -16,7 +16,7 @@ The Remez problem is the task of finding or calculating the best polynomial appr
 **[Selected optimization solvers](SelectedSolvers.md)**  
 The Optimization Task View presents a long list of optimization solvers available in R packages. Here is a selection of modern and state-of-the-art solvers, taken from the task view, for different optimization problem classes.
 
-**The 'Historize' routine**\
+**[The 'Historize' routine](HistorizeFunction.md)**\
 The `Historize` routine will enable functions to keep track of inputs and values during a series of function calls. This can be helpful for debugging and for visualizing calls, e.g., in integration or optimization applications.
 
 **Compare Nelder-Mead solvers**\
