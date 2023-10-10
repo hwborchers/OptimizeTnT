@@ -40,9 +40,7 @@ Filling the storage will take extra time and can slow down the function calls. E
 
 Functions can have multivariate output; the user is asked to take care of handling the output vector or matrix correctly. The function may even require additional parameters that can be provided through the `...` mechanism.
 
-::: {.callout-note}
-The new version of `Historize` will be part of *adagio* Version 0.9.1. This version is not yet on CRAN, but can be downloaded from R-Forge.
-:::
+**Note**: The new version of `Historize` will be part of *adagio* Version 0.9.1. This version is not yet on CRAN, but can be downloaded from R-Forge, or can be copied from the Appendix.
 
 
 ## Examples
