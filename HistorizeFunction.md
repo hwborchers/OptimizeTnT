@@ -245,7 +245,7 @@ Historize <- function (fun, len = 0, ...) {
                         return(list(input = NULL, values = NULL,
                                nvars = 0, ncalls = 0))
                     } else if (m1 %% m2 != 0) {
-                        error("Input length not consistent with no. of calls.")
+                        stop("Input length not consistent with no. of calls.")
                     } else {
                         n <- m1/m2
                     }
