@@ -13,7 +13,7 @@ We will look at the *stereographic projection* and how it can help to solve opti
 **[The Remez problem](RemezProblem.md)**  
 The Remez problem is the task of finding or calculating the best polynomial approximation of a continuous function on a closed interval such that the maximum absolute distance between the polynomial and the function is minimized.|
 
-**[Selected optimization solvers](SelectedSolvers.md)**  
+**[Recommended optimization solvers](SelectedSolvers.md)**  
 The Optimization Task View presents a long list of optimization solvers available in R packages. Here is a selection of modern and state-of-the-art solvers, taken from the task view, for different optimization problem classes.
 
 **[The 'Historize' routine](HistorizeFunction.md)**\
