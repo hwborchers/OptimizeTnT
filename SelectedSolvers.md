@@ -1,5 +1,5 @@
 
-# Selected Optimization Packages
+# Recommended Optimization Solvers
 
 The Optimization Task View presents a long list of optimization solvers available in R packages. Here is a selection of modern and state-of-the-art solvers, taken from the task view, for different optimization problem classes. Each solver is accompanied by a usage line, a link to its help page, and maybe to an appropriate Wikipedia page.
 
