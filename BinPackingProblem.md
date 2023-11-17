@@ -1,5 +1,8 @@
 # Bin Packing Problem
 
+Author: Hans W Borchers  
+Date: November 15, 2023
+
 ## Introduction
 
 ### The problem
