@@ -1,14 +1,4 @@
----
-title: "Bin Packing Problem"
-author: "Hans W Borchers"
-date: "2023-11-15"
-theme: sandstone
-format: 
-  html:
-    keep-md: true
----
-
-
+# Bin Packing Problem
 
 ## Introduction
 
