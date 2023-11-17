@@ -28,7 +28,7 @@ Functions that are defined as the maximum of other functions are not smooth and 
 **Visualizing optimization solutions**\
 In higher dimensions, visualize a function along a line between two near-optimal solutions, helping to decide which one is the true optimum.
 
-**The Bin Packing problem**  
+**[The Bin Packing problem](BinPackingProblem.md)**\ 
 Solve the *Bin Packing Problem* (BPP) as a 'Mixed-Integer Linear Programming Problem' and use this model to compare some MILP solvers available in packages on CRAN.
 
 **Solve optimization problems with 'higher-accuracy' precision**  
