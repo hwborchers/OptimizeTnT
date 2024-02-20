@@ -352,7 +352,7 @@ DEoptim(fn, lower, upper,
 
 `DEoptim` implements the Differential Evolution (DE) algorithm similar to what is described in the book "Differential Evolution – A Practical Approach to Global Optimization" by Price et al. The package relies on an interface to a C implementation of DE, which is effective and fast.
 
-The control options `NP` (for population size) and `maxiter` should probably be set 5-10 times higher than the default. The recommended strategies are `2` (default) or `3` in `DEoptim.control(strategy = ..)`.
+The control options `NP` (for population size) and `itermax` should probably be set 5-10 times higher than the default. The recommended strategies are `2` (default) or `3` in `DEoptim.control(strategy = ..)`.
 
 ----
 
