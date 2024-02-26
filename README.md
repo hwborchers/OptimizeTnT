@@ -22,7 +22,7 @@ The `Historize` routine will enable functions to keep track of inputs and values
 **Compare Nelder-Mead solvers**\
 There are several implementations of Nelder-Mead optimization solvers in R packages. We will compare them in terms of accuracy and run-time behavior.
 
-**Solving 'Minimax' optimization problems**\
+**[Solving 'Minimax' optimization problems](MinimaxProblems.md)**\
 Functions that are defined as the maximum of other functions are not smooth and cannot be optimized by most solvers. We will show how this can be converted into a smooth problem and be solved exactly.
 
 **Visualizing optimization solutions**\
