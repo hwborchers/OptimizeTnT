@@ -1,28 +1,3 @@
----
-title: "Optimizing Minimax Problems"
-author: "Hans W Borchers"
-date: "October 2020"
-format:
-  html:
-    # minimal: true
-    toc: true
-    toc-location: right
-    toc-depth: 2
-    anchor-sections: true
-    number-sections: false
-    number-depth: 3
-    code-fold: true
-    html-math-method: katex
-    embed-resources: false
-    keep-md: true
-    fig-width: 6
-    fig-height: 4
-    theme:
-      light: flatly
-      dark: solar
----
-
-
 
 ## Minimax functions and constraints
 
