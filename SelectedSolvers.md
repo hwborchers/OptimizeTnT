@@ -91,26 +91,6 @@ see `nloptr.print.options()` for all options!
 
 ----
 
-#### optimx::**optimr**
-
-```r
-optimr(par, fn, gr=NULL, hess=NULL, method=NULL, lower=-Inf, upper=Inf, 
-          hessian=FALSE, control=list(), ...
-)
-```
-[help page](https://cran.r-universe.dev/optimx/doc/manual.html#optimr)
-
-General-purpose optimization wrapper function that calls other R tools for optimization, including the existing `optim` function. Careful reimplementations in pure R of methods originally available in `optim`.
-
-The `optimr` function supports the following methods:
-
-* `optimr(method = "nvm")` -- variable metric method
-* `optimr(method = "ncg")` -- conjugate gradient method
-
-*Note*: This package is under development.
-
-----
-
 ----
 
 ### Constrained optimization
@@ -292,8 +272,11 @@ result$getValue(x)                          # retrieve the results
 ### Derivative-free optimization
 
 > 'Derivative-free' means numerical optimization without the use of gradients (or hessians). The most popular candidate is Nelder-Mead, a simplex-based direct search method.
--- [wp:Nelder-Mead](https://en.wikipedia.org/wiki/Nelder-Mead_method) and [wp:Derivative-free optimization](https://en.wikipedia.org/wiki/Derivative-free_optimization)  
-> *Note*: Saying an algorithm is derivative-free does *not* mean it will minimize nonsmooth objective functions effectively!
+-- [wp:Nelder-Mead](https://en.wikipedia.org/wiki/Nelder-Mead_method) and [wp:Derivative-free optimization](https://en.wikipedia.org/wiki/Derivative-free_optimization)
+
+> *Note*: Gradient-free solvers without constraints can be equipped with inequality constraints by wrapping them into a function that returns `Inf` (or some large value) if constraints are violated.
+
+> *Remark*: Saying an algorithm is derivative-free does *not* mean it will minimize nonsmooth objective functions effectively!
 
 #### dfoptim::**nmk**
 
