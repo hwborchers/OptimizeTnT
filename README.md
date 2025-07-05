@@ -34,5 +34,5 @@ Solve the *Bin Packing Problem* (BPP) as a 'Mixed-Integer Linear Programming Pro
 * **Solve optimization problems with 'higher-accuracy' precision**  
 If floating-point precision is not enough, there is the possibility to get more accurate optimization results by using 'big' floating-point numbers.
 
-* **[Calculus of Variations problem](cov_problem.html.md)**\
+* **[Calculus of Variations problem](CoV_problem.html.md)**\
 Example of solving a "Calculus of Variations" (CoV) task of minimizing a functional integral as an optimization problem with hundreds of variables (and comparing it with the solution found by integrating the Euler-Lagrange equation).
