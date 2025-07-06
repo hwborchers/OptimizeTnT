@@ -1,35 +1,10 @@
----
-title: "A 'calculus of variations' Optimization Problem"
-author: "Hans W. Borchers"
-date: "2024-11-22"
-format:
-  html:
-    theme: sandstone
-    toc: true
-    toc-depth: 4
-    collapsed: false
-    fig-width: 6
-    fig-height: 4.5
-    keep-md: true
-  pdf:
-    toc: true
----
+```r
+library(pracma)
+library(deSolve)
+library(nloptr)
 
-
-::: {.cell}
-
-```{.r .cell-code}
-# library(pracma)
-# library(deSolve)
-# library(nloptr)
-
-source("luksan17/rfunctions.R")
+source("luksan17/rfunctions.R")  # cf. Appendix
 ```
-:::
-
-
-
-
 
 ## The Problem
 
