@@ -23,7 +23,7 @@ We will first find an exact solution, following the traditional 'calculus of var
 
 ## Go 'Calculus of Variations'
 
-### The Euler-Lagrange equation
+### The Euler-Lagrange Equation
 
 The general approach to solve such a 'calculus of variations' problem is to write down (and solve) the **Euler-Lagrange equation**. If the task is to minimize $\int F(x, y, y') dx$, then this equation will be
 
@@ -83,7 +83,7 @@ plot(f1, 0, 1, col="firebrick",
      main="Symbolic Solution"); grid()
 ```
 
-![Exact solution](figs/cov-exact.png)
+<img src="./figs/cov-exact.png" width="576">
 
 The minimum of this function is at $x=1/2$ with value $-0.1137036676$.
 
@@ -94,14 +94,12 @@ f2 = function(x) {
     0.5*pracma::fderiv(f1, x)^2 + exp(f1(x)) - 1
 }
 
-cat("The minimum of the functional integral is", '\n')
 integrate(f2, 0, 1, rel.tol=1e-12)
 ```
 
-to find a value for the integral to be minimized-
+to find a value for the integral to be minimized as
 
 ```
-The minimum of the functional integral is 
 -0.03799204 with absolute error < 3.9e-14
 ```
 
@@ -122,7 +120,6 @@ f_ode = function(x, y, ...) {
 
 We will apply deSolve::ode with method 'lsoda', that implements a Runge-Kutta solver. The integration limits are 0 and 1, and the function and derivative values at 0 are 0 and -0.5 as a start.
 
-
 ```r
 n = 512
 xs = seq(0, 1, length.out=n+1)
@@ -131,7 +128,9 @@ sol = deSolve::ode(y=c(0,-0.5), times=xs, f_ode, parma=NULL, method="lsoda")
 
 The number of points is 512; this is the highest number of subintervals that is acceptable for our optimization procedures.
 
-![](CoV_problem_files/figure-html/unnamed-chunk-7-1.png)
+![](./figs/cov-first.png)
+
+### The Shooting Method
 
 Now we must ensure that the function value at $x=1$ is also 0. To do this we employ the **shooting method** and vary the slope at $x=0$ such that the function value at $x=1$ will also be 0. The `uniroot` function of R will get this done for us.
 
@@ -151,8 +150,7 @@ cat("The slope at x=0 shall be", slp, '!')
 The slope at x=0 shall be -0.4636326 !
 ```
 
-![Exact solution](figs/cov-exact2.png)
-
+<img src="./figs/cov-second.png" width="576">
 
 ```r
 print(min(sol[, 2]), digits=12)
