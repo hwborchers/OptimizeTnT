@@ -232,11 +232,15 @@ The differences stem from the numerical computations, but also from the discreti
 | method        | fmin          | integral min  | comment        |
 |---------------|---------------|---------------|----------------|
 | symbolic ODE  | -0.1137036676 | -0.03799204   | + num. integr. |
-| numeric ODE   | -0.1137036568 | -0.03798969   | + num. integr. |
+| numeric ODE   | -0.1137036568 | -0.03799145   | + num. integr. |
 | numeric optim | -0.1196984    | -0.03801322   | ucminf, nloptr |
 | approximation | -0.1140122    | -0.03798849   | parabolic      |
 
+The solution looks almost like a parabolic, a polynomial of degree 2 -- but is not. I have approximated it by such a curve and calculated the minimum of the corresponding integral.
+
 ### Function 'f5der.R'
+
+The following function takes function values 'y' at "equally distant" grid points with distance 'h' and calculates the derivative at these points.
 
 ```r
 fe5der = function(y, h) {
