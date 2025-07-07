@@ -83,7 +83,7 @@ plot(f1, 0, 1, col="firebrick",
      main="Symbolic Solution"); grid()
 ```
 
-![](CoV_problem_files/figure-html/unnamed-chunk-3-1.png){width=576}
+![](CoV_problem_files/figure-html/unnamed-chunk-3-1.png)
 
 The minimum of this function is at $x=1/2$ with value $-0.1137036676$.
 
@@ -94,12 +94,14 @@ f2 = function(x) {
     0.5*pracma::fderiv(f1, x)^2 + exp(f1(x)) - 1
 }
 
+cat("The minimum of the functional integral is", '\n')
 integrate(f2, 0, 1, rel.tol=1e-12)
 ```
 
 to find a value for the integral to be minimized-
 
 ```
+The minimum of the functional integral is 
 -0.03799204 with absolute error < 3.9e-14
 ```
 
