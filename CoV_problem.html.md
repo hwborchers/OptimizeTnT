@@ -83,7 +83,7 @@ plot(f1, 0, 1, col="firebrick",
      main="Symbolic Solution"); grid()
 ```
 
-![](CoV_problem_files/figure-html/unnamed-chunk-3-1.png)
+![Exact solution](figs/cov-exact2.png)
 
 The minimum of this function is at $x=1/2$ with value $-0.1137036676$.
 
