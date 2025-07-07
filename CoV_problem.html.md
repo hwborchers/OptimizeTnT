@@ -18,10 +18,12 @@ with boundary conditions $y(0)=0$ and $y(1)= 0$.
 
 To solve this problem as a numerical optimization problem, we will have to discretize it with, say, $n \approx 1000$ equidistant grid points on the interval from 0 to 1. The derivatives will be approximated through a *finite element difference formula* and the integral will be evaluated with the *simpson* or *trapezoidal* integration rule.
 
-
-## The Euler-Lagrange equation
-
 We will first find an exact solution, following the traditional 'calculus of variations' (CoV) way since Euler's times.
+
+
+## Go 'Calculus of Variations'
+
+### The Euler-Lagrange equation
 
 The general approach to solve such a 'calculus of variations' problem is to write down (and solve) the **Euler-Lagrange equation**. If the task is to minimize $\int F(x, y, y') dx$, then this equation will be
 
@@ -57,18 +59,12 @@ I was not able to force Mathematica to return numerical values for the constants
 [stackoverflow](https://math.stackexchange.com/questions/5053678/).
 
 
+For future use we will define these constants in R:
 
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 c1 = -1.78504481989104354
 c2 = -0.5
 ```
-:::
-
-
-
 
 On the Stackoverflow page you see a further simplification that we will not use here. The final form of our solution is
 
@@ -78,12 +74,7 @@ $$
 
 and the following function is an R implementation, using 'sec' instead of 'sech' to avoid imaginary values.
 
-
-
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 c1a = abs(c1)
 f1 = function(x) log(c1a/2*pracma::sec(sqrt(c1a)/4*(1-2*x))^2)
 
@@ -92,24 +83,13 @@ plot(f1, 0, 1, col="firebrick",
      main="Symbolic Solution"); grid()
 ```
 
-::: {.cell-output-display}
 ![](CoV_problem_files/figure-html/unnamed-chunk-3-1.png){width=576}
-:::
-:::
-
-
-
 
 The minimum of this function is at $x=1/2$ with value $-0.1137036676$.
 
 We will integrate the function, whose integral is to be minimized, numerically to get
 
-
-
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 f2 = function(x) {
     0.5*pracma::fderiv(f1, x)^2 + exp(f1(x)) - 1
 }
@@ -117,18 +97,11 @@ f2 = function(x) {
 integrate(f2, 0, 1, rel.tol=1e-12)
 ```
 
-::: {.cell-output .cell-output-stdout}
+to find a value for the integral to be minimized-
 
 ```
 -0.03799204 with absolute error < 3.9e-14
 ```
-
-
-:::
-:::
-
-
-
 
 
 ### The Numerical ODE Solution
