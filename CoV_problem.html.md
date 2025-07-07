@@ -126,9 +126,10 @@ xs = seq(0, 1, length.out=n+1)
 sol = deSolve::ode(y=c(0,-0.5), times=xs, f_ode, parma=NULL, method="lsoda")
 ```
 
+<img src="./figs/cov-first.png" width="576">
+
 The number of points is 512; this is the highest number of subintervals that is acceptable for our optimization procedures.
 
-![](./figs/cov-first.png)
 
 ### The Shooting Method
 
@@ -186,11 +187,7 @@ The minimal value of the functional integral is -0.03799145 .
 We define an objective function with 99 variables and prepending and appending the the constraints $y(0)=0$ and $y(1)=0$. The derivatives are calculated with the `gradient` function in *pracma*, and the function is integrated with the `trapz` function from *pracma* again.
 
 
-
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 n = 512; h = 1/n
 fobj = function(y) {
     # length(y) == n-1
@@ -201,19 +198,10 @@ fobj = function(y) {
     pracma::trapz(xx, fn)           # integral as tapezoidal rule
 }
 ```
-:::
-
-
-
 
 We minimize the integral with a gradient-based solver such as `ucminf`.
 
-
-
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 x0 = numeric(n+1)
 for (i in 1:(n+1)) x0[i] = (i-1)*h*(1 - (i-1)*h)
 sol = nloptr::lbfgs(numeric(n-1), fn = fobj,
@@ -221,33 +209,16 @@ sol = nloptr::lbfgs(numeric(n-1), fn = fobj,
 cat("The minimal value of the functional integral is", sol$value)
 ```
 
-::: {.cell-output .cell-output-stdout}
-
 ```
 The minimal value of the functional integral is -0.03801322
 ```
-
-
-:::
-:::
-
-
 
 Compare this with a value of -0.03799204 calculated with the approach of calculating the minimum through solving the Euler-Lagrange equation numerically.
 
 We can compare the two solutions by overlaying them. The following plot shows the solution obtained by numerical optimization as points, and the numerical solution of the Euler-Lagrange equation as a solid line.
 
-
-
-
-::: {.cell}
-::: {.cell-output-display}
 ![](CoV_problem_files/figure-html/unnamed-chunk-14-1.png){width=576}
-:::
-:::
-
-
-
+<img src="./figs/cov-compare.png" width="576">
 
 One can see how much the two solutions coincide, one the solution of the Euler-Lagrange equation, the other the solution of a minimization problem. The maximal absolute difference between these solutions is $7.15e-05$.
 
