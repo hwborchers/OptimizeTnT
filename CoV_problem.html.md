@@ -151,7 +151,7 @@ cat("The slope at x=0 shall be", slp, '!')
 The slope at x=0 shall be -0.4636326 !
 ```
 
-![](CoV_problem_files/figure-html/unnamed-chunk-9-1.png)
+![](figs/historize-fig1.png)
 
 
 ```r
