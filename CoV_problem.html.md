@@ -225,7 +225,9 @@ One can see how much the two solutions coincide, one the solution of the Euler-L
 The differences stem from the numerical computations, but also from the discretization of the problem. Increasing the number of variables, for instance to $n \approx 1024$, will lead to a higher accuracy.
 
 
-## Final Comparision
+## Appendix
+
+### Final Comparison
 
 | method        | fmin          | integral min  | comment        |
 |---------------|---------------|---------------|----------------|
@@ -233,3 +235,27 @@ The differences stem from the numerical computations, but also from the discreti
 | numeric ODE   | -0.1137036568 | -0.03798969   | + num. integr. |
 | numeric optim | -0.1196984    | -0.03801322   | ucminf, nloptr |
 | approximation | -0.1140122    | -0.03798849   | parabolic      |
+
+### Function 'f5der.R'
+
+```r
+fe5der = function(y, h) {
+    n = length(y)
+    if (n < 5) stop("Length of y >= 5 required.")
+    dy = numeric(n)
+    
+    # 5-point forward difference formula
+    dy[1] =  (-25*y[1] + 48*y[2] - 36*y[3] + 16*y[4] - 3*y[5]) / (12*h)
+    dy[n] = -(-25*y[n] + 48*y[n-1] - 36*y[n-2] + 16*y[n-3] - 3*y[n-4])/(12*h)
+    
+    # 5-point backward difference formula
+    dy[2]   =  (-3*y[1] - 10*y[2] + 18*y[3] - 6*y[4] + y[5]) / (12*h)
+    dy[n-1] = -(-3*y[n] - 10*y[n-1] + 18*y[n-2] - 6*y[n-3] + y[n-4]) / (12*h)
+    
+    # 5-point midpoint difference formula
+    for (k in 3:(n-2)) {
+        dy[k] = (-y[k+2]+8*y[k+1]-8*y[k-1]+y[k-2]) / (12*h)
+    }
+    return(dy)
+}
+```
