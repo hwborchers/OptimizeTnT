@@ -112,62 +112,30 @@ Instead we will compute a numeric solution for the differential equation based o
 
 The second-order equation is reformulated as a system of two first-order equations. Then we define the integrand in the usual way.
 
-
-
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 f_ode = function(x, y, ...) {
     dy1 = y[2]
     dy2 = exp(y[1])
     return(list(c(dy1, dy2)))
 }
 ```
-:::
-
-
-
 
 We will apply deSolve::ode with method 'lsoda', that implements a Runge-Kutta solver. The integration limits are 0 and 1, and the function and derivative values at 0 are 0 and -0.5 as a start.
 
 
-
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 n = 512
 xs = seq(0, 1, length.out=n+1)
 sol = deSolve::ode(y=c(0,-0.5), times=xs, f_ode, parma=NULL, method="lsoda")
 ```
-:::
-
-
-
 
 The number of points is 512; this is the highest number of subintervals that is acceptable for our optimization procedures.
 
-
-
-
-::: {.cell}
-::: {.cell-output-display}
-![](CoV_problem_files/figure-html/unnamed-chunk-7-1.png){width=576}
-:::
-:::
-
-
-
+![](CoV_problem_files/figure-html/unnamed-chunk-7-1.png)
 
 Now we must ensure that the function value at $x=1$ is also 0. To do this we employ the **shooting method** and vary the slope at $x=0$ such that the function value at $x=1$ will also be 0. The `uniroot` function of R will get this done for us.
 
-
-
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 fct = function(y1) {
     # s = ode45(f_el, 0, 1, c(0, y1), hmax=0.01)
     s = deSolve::ode(y=c(0, y1), times=xs, f_ode, parma=NULL, method="lsoda")
@@ -179,51 +147,27 @@ slp = uniroot(fct, c(-0.1, -0.9), tol = 1e-12)$root
 cat("The slope at x=0 shall be", slp, '!')
 ```
 
-::: {.cell-output .cell-output-stdout}
-
 ```
 The slope at x=0 shall be -0.4636326 !
 ```
 
+![](CoV_problem_files/figure-html/unnamed-chunk-9-1.png)
 
-:::
-:::
 
-::: {.cell}
-::: {.cell-output-display}
-![](CoV_problem_files/figure-html/unnamed-chunk-9-1.png){width=576}
-:::
-:::
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 print(min(sol[, 2]), digits=12)
 ```
-
-::: {.cell-output .cell-output-stdout}
 
 ```
 [1] -0.113703656779
 ```
 
 
-:::
-:::
-
-
-
-
 ### The value of the functional integral
 
 The list values that `sol_el` returns enable us to calculate the minimal value of the integral manually.
 
-
-
-
-::: {.cell}
-
-```{.r .cell-code}
+```r
 x1 = sol[, 1]
 y1 = sol[, 2]
 y2 = sol[, 3]
@@ -232,17 +176,9 @@ t = pracma::trapz(x1, ys)
 cat("The minimal value of the functional integral is", t, '.')
 ```
 
-::: {.cell-output .cell-output-stdout}
-
 ```
 The minimal value of the functional integral is -0.03799145 .
 ```
-
-
-:::
-:::
-
-
 
 
 ## The numerical optimization solution
