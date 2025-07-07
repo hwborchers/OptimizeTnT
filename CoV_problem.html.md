@@ -217,7 +217,6 @@ Compare this with a value of -0.03799204 calculated with the approach of calcula
 
 We can compare the two solutions by overlaying them. The following plot shows the solution obtained by numerical optimization as points, and the numerical solution of the Euler-Lagrange equation as a solid line.
 
-![](CoV_problem_files/figure-html/unnamed-chunk-14-1.png){width=576}
 <img src="./figs/cov-compare.png" width="576">
 
 One can see how much the two solutions coincide, one the solution of the Euler-Lagrange equation, the other the solution of a minimization problem. The maximal absolute difference between these solutions is $7.15e-05$.
