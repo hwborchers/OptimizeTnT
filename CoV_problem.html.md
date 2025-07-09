@@ -16,7 +16,7 @@ $$
 
 with boundary conditions $y(0)=0$ and $y(1)= 0$.
 
-To solve this problem as a numerical optimization problem, we will have to discretize it with, say, $n \approx 1000$ equidistant grid points on the interval from 0 to 1. The derivatives will be approximated through a *finite element difference formula* and the integral will be evaluated with the *simpson* or *trapezoidal* integration rule.
+To solve this problem as a numerical optimization problem, we will have to discretize it with, say, $n \approx 500$ equidistant grid points on the interval from 0 to 1. The derivatives will be approximated through a *finite element difference formula* and the integral will be evaluated with the *simpson* or *trapezoidal* integration rule.
 
 We will first find an exact solution, following the traditional 'calculus of variations' (CoV) way since Euler's times.
 
@@ -39,7 +39,7 @@ $$
 
 that is, a second-order differential equation with boundary conditions $y(0) = y(1) = 0$.
 
-## The symbolic solution
+### The symbolic solution
 
 We will try to solve this equation symbolically, i.e., with the help of the Computer Algebra System (CAS)  *Mathematica*. (Please note that the [Wolfram Cloud](https://www.wolfram.cloud/) does not have enough power or is not allowed to return a valid solution.)
 
